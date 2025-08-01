@@ -37,11 +37,9 @@ export default function DashboardPage() {
                   <p className="text-muted-foreground">{tool.description}</p>
                 </CardContent>
                 <div className="p-6 pt-0">
-                  <Link href={tool.href} passHref legacyBehavior>
-                    <Button asChild className="w-full">
-                      <a>Open Tool</a>
-                    </Button>
-                  </Link>
+                  <Button asChild className="w-full">
+                    <Link href={tool.href}>Open Tool</Link>
+                  </Button>
                 </div>
               </Card>
             ))}
