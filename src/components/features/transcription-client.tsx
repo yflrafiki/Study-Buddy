@@ -39,7 +39,15 @@ export function TranscriptionClient() {
 
       recognition.onerror = (event) => {
         console.error('Speech recognition error', event.error);
-        toast({ title: 'Recognition Error', description: `An error occurred: ${event.error}`, variant: 'destructive' });
+        let description = `An error occurred: ${event.error}`;
+        if (event.error === 'network') {
+          description = 'A network error occurred. Please check your internet connection and try again.';
+        } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          description = 'Microphone access was denied. Please allow microphone access in your browser settings.';
+        } else if (event.error === 'no-speech') {
+          description = 'No speech was detected. Please try again.';
+        }
+        toast({ title: 'Recognition Error', description, variant: 'destructive' });
         setIsRecording(false);
       };
 
@@ -55,7 +63,16 @@ export function TranscriptionClient() {
       recognition.stop();
     } else {
       setTranscription(''); // Clear previous transcription
-      recognition.start();
+      try {
+        recognition.start();
+      } catch (e) {
+        // This can happen if start() is called while already active, which we prevent with isRecording.
+        // It can also happen in some browser states.
+        console.error("Failed to start recognition", e);
+        toast({ title: 'Could not start recording', description: 'There was an issue starting the speech recognition service.', variant: 'destructive' });
+        setIsRecording(false);
+        return;
+      }
     }
     setIsRecording(!isRecording);
   };
