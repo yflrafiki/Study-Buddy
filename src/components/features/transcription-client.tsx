@@ -30,6 +30,7 @@ export function TranscriptionClient() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [audioResult, setAudioResult] = useState<AudioResult | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
@@ -105,6 +106,10 @@ export function TranscriptionClient() {
   const handleClear = () => {
     setTranscription('');
     setAudioResult(null);
+     setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -207,7 +212,7 @@ export function TranscriptionClient() {
           <TabsContent value="upload" className="mt-4">
              <div className="space-y-4">
                 <div className="min-h-[200px] border-dashed border-2 rounded-lg flex flex-col items-center justify-center p-4 text-center">
-                  <Input id="audio-upload" type="file" accept="audio/*" onChange={handleFileChange} className="hidden"/>
+                  <Input id="audio-upload" type="file" accept="audio/*" onChange={handleFileChange} className="hidden" ref={fileInputRef} />
                   <Label htmlFor="audio-upload" className={cn("cursor-pointer flex flex-col items-center justify-center gap-2", file && "text-green-600")}>
                       <Paperclip className="h-8 w-8 text-muted-foreground" />
                       {file ? 
@@ -216,10 +221,16 @@ export function TranscriptionClient() {
                       }
                   </Label>
                 </div>
-                <Button onClick={handleFileUpload} disabled={isLoading || !file}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
-                    {isLoading ? 'Processing...' : 'Transcribe & Summarize'}
-                </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={handleFileUpload} disabled={isLoading || !file}>
+                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
+                        {isLoading ? 'Processing...' : 'Transcribe & Summarize'}
+                    </Button>
+                    <Button onClick={handleClear} variant="ghost" disabled={isLoading || (!file && !audioResult)}>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Clear
+                    </Button>
+                </div>
                 {isLoading && (
                   <div className="flex flex-col justify-center items-center p-8 text-center rounded-lg border border-dashed">
                       <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
