@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { aiChatbot } from '@/ai/flows/ai-chatbot';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Send, Bot, User, Paperclip } from 'lucide-react';
+import { Loader2, Send, Bot, User, Paperclip, Trash2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +27,26 @@ export function ChatbotClient() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+   useEffect(() => {
+    try {
+      const savedMessages = localStorage.getItem('chatHistory');
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      }
+    } catch (error) {
+      console.error('Failed to parse chat history from localStorage', error);
+      // If parsing fails, we can clear it to prevent further errors
+      localStorage.removeItem('chatHistory');
+    }
+  }, []);
+
+  useEffect(() => {
+    // We only want to save if there's something to save, and it's not the initial empty array
+    if (messages.length > 0) {
+      localStorage.setItem('chatHistory', JSON.stringify(messages));
+    }
+  }, [messages]);
 
   const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -46,6 +66,15 @@ export function ChatbotClient() {
       }
       setFile(selectedFile);
     }
+  };
+
+   const handleClearHistory = () => {
+    setMessages([]);
+    localStorage.removeItem('chatHistory');
+    toast({
+      title: 'Chat History Cleared',
+      description: 'Your conversation has been removed.',
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,9 +167,17 @@ export function ChatbotClient() {
       </Card>
 
       <Card className="lg:col-span-2 flex flex-col">
-        <CardHeader>
-          <CardTitle>Chat</CardTitle>
-          <CardDescription>Ask a question based on the context provided.</CardDescription>
+         <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+                <CardTitle>Chat</CardTitle>
+                <CardDescription>Ask a question based on the context provided.</CardDescription>
+            </div>
+             {messages.length > 0 && (
+                <Button variant="ghost" size="sm" onClick={handleClearHistory} aria-label="Clear chat history">
+                    <Trash2 className="h-4 w-4" />
+                    Clear History
+                </Button>
+            )}
         </CardHeader>
         <CardContent className="flex-1 flex flex-col gap-4">
           <ScrollArea className="flex-1 h-[400px] border rounded-md p-4">
