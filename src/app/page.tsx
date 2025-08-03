@@ -19,6 +19,7 @@ export default function DashboardPage() {
       <header>
         <h1 className="text-3xl font-bold font-headline tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">Welcome to ScholarAI! Here are your tools to get started.</p>
+        <p className="text-muted-foreground">Let's get those grades up</p>
       </header>
       
       <main className="flex-grow">
