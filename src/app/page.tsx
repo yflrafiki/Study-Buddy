@@ -1,6 +1,6 @@
 import { ProgressTracker } from '@/components/features/progress-tracker';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bot, FileQuestion, BookOpen, Mic, ImagePlay, CalendarDays } from 'lucide-react';
+import { Bot, FileQuestion, BookOpen, Mic, ImagePlay } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -10,7 +10,6 @@ const tools = [
   { href: '/flashcards', label: 'Flashcards', icon: BookOpen, description: "Create flashcards from notes or PDFs." },
   { href: '/transcription', label: 'Note Taker', icon: Mic, description: "Transcribe your lectures in real-time." },
   { href: '/image-animator', label: 'Image Animator', icon: ImagePlay, description: "Animate images for visual aids." },
-  { href: '/calendar', label: 'Calendar', icon: CalendarDays, description: "Connect your Google Calendar." },
 ];
 
 export default function DashboardPage() {

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Bot,
-  CalendarDays,
   FileQuestion,
   LayoutDashboard,
   GraduationCap,
@@ -32,7 +31,6 @@ const menuItems = [
   { href: '/flashcards', label: 'Flashcards', icon: BookOpen },
   { href: '/transcription', label: 'Note Taker', icon: Mic },
   { href: '/image-animator', label: 'Image Animator', icon: ImagePlay },
-  { href: '/calendar', label: 'Calendar', icon: CalendarDays },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
