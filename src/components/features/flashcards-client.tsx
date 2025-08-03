@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, RefreshCw, FileUp, Paperclip } from 'lucide-react';
+import { Loader2, RefreshCw, Paperclip, Download } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 
@@ -114,6 +114,36 @@ export function FlashcardsClient() {
     }
   };
 
+  const handleDownload = () => {
+    if (!flashcards || flashcards.length === 0) {
+      toast({
+        title: 'No flashcards to download',
+        description: 'Please generate some flashcards first.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const fileContent = flashcards
+      .map((card) => `Term: ${card.term}\nDefinition: ${card.definition}\n\n`)
+      .join('');
+    
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'flashcards.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+        title: 'Download Started',
+        description: 'Your flashcards are being downloaded as flashcards.txt.'
+    });
+  };
+
   return (
     <div className="space-y-8">
       <Card>
@@ -167,7 +197,13 @@ export function FlashcardsClient() {
 
       {flashcards && flashcards.length > 0 && (
         <div>
-          <h2 className="text-2xl font-semibold font-headline mb-4">Your Flashcards</h2>
+           <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold font-headline">Your Flashcards</h2>
+              <Button onClick={handleDownload} variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+            </div>
           <Carousel className="w-full max-w-xl mx-auto" opts={{ loop: true }}>
             <CarouselContent>
               {flashcards.map((card, index) => (

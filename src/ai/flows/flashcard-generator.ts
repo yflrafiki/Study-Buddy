@@ -33,13 +33,12 @@ const prompt = ai.definePrompt({
   name: 'generateFlashcardsPrompt',
   input: {schema: GenerateFlashcardsInputSchema},
   output: {schema: GenerateFlashcardsOutputSchema},
-  prompt: `You are an expert educator, skilled at creating flashcards from text.
-
-  Generate flashcards from the following text. Each flashcard should have a term and a definition.
+ prompt: `You are an expert educator, skilled at creating flashcards from documents.
+  Generate a set of at least 5-10 flashcards from the following text. Each flashcard should have a term and a definition.
   The term should be a key concept from the text, and the definition should be a concise explanation of the term.
   Ensure the flashcards are accurate and helpful for studying the material.
 
-  Text: {{{text}}}`,
+  Document: {{media url=pdfDataUri}}`,
 });
 
 const generateFlashcardsFlow = ai.defineFlow(
