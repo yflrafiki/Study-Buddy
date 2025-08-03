@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+   output: 'export', // Use 'export' for static export
   experimental: {
     appDir: true,            // ✅ Enables the app/ directory
   },
