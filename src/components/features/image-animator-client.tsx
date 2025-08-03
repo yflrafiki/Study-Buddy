@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { cartoonifyImage } from '@/ai/flows/cartoonify-image';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Wand2 } from 'lucide-react';
+import { Loader2, Wand2, Download } from 'lucide-react';
 
 const animations = [
   { value: 'animate-none', label: 'None' },
@@ -68,6 +68,23 @@ export function ImageAnimatorClient() {
     }
   };
 
+   const handleDownload = () => {
+    if (!cartoonSrc) {
+      toast({
+        title: 'No Cartoon',
+        description: 'There is no cartoon image to download.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = cartoonSrc;
+    link.download = 'cartoon.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <style jsx>{`
@@ -112,6 +129,12 @@ export function ImageAnimatorClient() {
             {isCartoonifying ? <Loader2 className="animate-spin" /> : <Wand2 />}
             <span>{isCartoonifying ? 'Creating Cartoon...' : 'Cartoonify Image'}</span>
           </Button>
+          {cartoonSrc && (
+              <Button onClick={handleDownload} variant="outline" className="w-full">
+                <Download />
+                <span>Download</span>
+              </Button>
+            )}
         </CardContent>
       </Card>
 
