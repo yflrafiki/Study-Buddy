@@ -62,13 +62,13 @@ const prompt = ai.definePrompt({
     schema: AiChatbotOutputSchema,
   },
   tools: [searchTool],
-  prompt: `You are a helpful AI chatbot that answers questions.
-  If the user provides context, answer based on that context.
-  If the user asks for real-time information (like current events, news, or weather), or for information you don't know, you must use the search tool to find a current answer.
+  prompt: `You are a helpful AI chatbot that answers questions. Remember and use information from the conversation history.
+  If the user asks for real-time information (like current events, sports, politics, news, or weather), or for information you don't know, you must use the search tool to find a current answer.
 
-Context: {{{context}}}
+Conversation History:
+{{{context}}}
 
-Question: {{{query}}}
+Current Question: {{{query}}}
 
 Answer: `,
 });
