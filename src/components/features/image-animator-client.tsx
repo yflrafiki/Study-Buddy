@@ -1,24 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
 import { cartoonifyImage } from '@/ai/flows/cartoonify-image';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Wand2, Download } from 'lucide-react';
-
-const animations = [
-  { value: 'animate-none', label: 'None' },
-  { value: 'animate-pulse', label: 'Pulse' },
-  { value: 'animate-bounce', label: 'Bounce' },
-  { value: 'animate-spin', label: 'Spin' },
-  { value: 'animate-ping-slow', label: 'Ping' },
-  { value: 'animate-zoom-in-out', label: 'Zoom' },
-];
 
 export function ImageAnimatorClient() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -27,34 +17,29 @@ export function ImageAnimatorClient() {
   const [animationClass, setAnimationClass] = useState('animate-none');
   const { toast } = useToast();
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (loadEvent) => {
-        const result = loadEvent.target?.result as string;
-        setImageSrc(result);
-        setCartoonSrc(null); // Reset cartoon on new image
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     const file = e.target.files[0];
+  //     const reader = new FileReader();
+  //     reader.onload = (loadEvent) => {
+  //       const result = loadEvent.target?.result as string;
+  //       setImageSrc(result);
+  //       setCartoonSrc(null); // Reset cartoon on new image
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
   
-  const handleCartoonify = async () => {
-    if (!imageSrc) {
-      toast({
-        title: 'No Image',
-        description: 'Please upload an image first.',
-        variant: 'destructive',
-      });
+  const handleCartoonify = useCallback(async (imageDataUri: string)=>{
+     if (!imageDataUri) {
       return;
     }
-    
+
     setIsCartoonifying(true);
     setCartoonSrc(null);
 
     try {
-      const result = await cartoonifyImage({ imageDataUri: imageSrc });
+      const result = await cartoonifyImage({ imageDataUri });
       setCartoonSrc(result.cartoonDataUri);
     } catch (error) {
       console.error(error);
@@ -65,6 +50,20 @@ export function ImageAnimatorClient() {
       });
     } finally {
       setIsCartoonifying(false);
+    }
+  }, [toast]);
+
+   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (loadEvent) => {
+        const result = loadEvent.target?.result as string;
+        setImageSrc(result);
+        setCartoonSrc(null); // Reset cartoon on new image
+        handleCartoonify(result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -108,27 +107,8 @@ export function ImageAnimatorClient() {
         <CardContent className="space-y-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="image-upload">Upload Image</Label>
-            <Input id="image-upload" type="file" accept="image/*" onChange={handleImageUpload} />
+            <Input id="image-upload" type="file" accept="image/*" onChange={handleImageUpload} disabled={isCartoonifying} />
           </div>
-          <div>
-            <Label htmlFor="animation-select">Animation</Label>
-            <Select onValueChange={setAnimationClass} defaultValue={animationClass}>
-              <SelectTrigger id="animation-select">
-                <SelectValue placeholder="Select animation" />
-              </SelectTrigger>
-              <SelectContent>
-                {animations.map((anim) => (
-                  <SelectItem key={anim.value} value={anim.value}>
-                    {anim.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-           <Button onClick={handleCartoonify} disabled={!imageSrc || isCartoonifying} className="w-full">
-            {isCartoonifying ? <Loader2 className="animate-spin" /> : <Wand2 />}
-            <span>{isCartoonifying ? 'Creating Cartoon...' : 'Cartoonify Image'}</span>
-          </Button>
           {cartoonSrc && (
               <Button onClick={handleDownload} variant="outline" className="w-full">
                 <Download />
