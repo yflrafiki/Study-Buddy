@@ -1,15 +1,13 @@
-import { ProgressTracker } from '@/components/features/progress-tracker';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bot, FileQuestion, BookOpen, Mic, ImagePlay } from 'lucide-react';
+import { Bot, FileQuestion, BookOpen, ImagePlay, BookText } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
 
 const tools = [
-  { href: '/mcq-generator', label: 'MCQ Generator', icon: FileQuestion, description: "Generate quizzes from your PDFs." },
-  { href: '/chatbot', label: 'AI Chatbot', icon: Bot, description: "Ask questions about documents or general topics." },
-  { href: '/flashcards', label: 'Flashcards', icon: BookOpen, description: "Create flashcards from notes or PDFs." },
-  { href: '/transcription', label: 'Note Taker', icon: Mic, description: "Transcribe your lectures in real-time." },
-  { href: '/image-animator', label: 'Image Animator', icon: ImagePlay, description: "Animate images for visual aids." },
+ { href: '/mcq-generator', label: 'Interactive Quiz', icon: FileQuestion, description: "Create a quiz from a PDF to test your knowledge." },
+  { href: '/chatbot', label: 'AI Chatbot', icon: Bot, description: "Chat with an AI about documents or general topics." },
+  { href: '/flashcards', label: 'Flashcards', icon: BookOpen, description: "Generate flashcards from your notes or PDFs." },
+  { href: '/image-animator', label: 'Image Animator', icon: ImagePlay, description: "Turn static images into simple animated visuals." },
 ];
 
 export default function DashboardPage() {
@@ -17,38 +15,35 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8 min-h-screen">
       <header>
         <h1 className="text-3xl font-bold font-headline tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome to ScholarAI! Here are your tools to get started.</p>
+        <p className="text-muted-foreground">Welcome to ScholarAI! Select a tool to get started</p>
         <p className="text-muted-foreground">Let's get those grades up</p>
       </header>
       
       <main className="flex-grow">
-        <section className='mb-8'>
-          <h2 className="text-2xl font-semibold font-headline mb-4">Your Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tools.map(tool => (
-              <Card key={tool.href} className="flex flex-col hover:shadow-lg transition-shadow duration-300">
-                <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                  <div className="p-3 bg-primary/10 rounded-lg">
-                    <tool.icon className="w-6 h-6 text-primary" />
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Tools</CardTitle>
+            <CardDescription>Your AI-powered study companion tools.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col">
+              {tools.map((tool, index) => (
+                <Link href={tool.href} key={tool.href}>
+                  <div className={`flex items-center p-4 hover:bg-muted/50 transition-colors duration-200 cursor-pointer ${index < tools.length - 1 ? 'border-b' : ''}`}>
+                    <div className="p-2 bg-primary/10 rounded-lg mr-4">
+                      <tool.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-semibold">{tool.label}</h3>
+                      <p className="text-sm text-muted-foreground">{tool.description}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground ml-4" />
                   </div>
-                  <CardTitle>{tool.label}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow pt-2">
-                  <p className="text-muted-foreground">{tool.description}</p>
-                </CardContent>
-                <div className="p-6 pt-0">
-                  <Button asChild className="w-full">
-                    <Link href={tool.href}>Open Tool</Link>
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <ProgressTracker />
-        </section>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

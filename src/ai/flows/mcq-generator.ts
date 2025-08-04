@@ -19,7 +19,7 @@ const MCQGeneratorInputSchema = z.object({
     ),
   numberOfQuestions: z
     .number()
-    .default(5)
+    .default(30)
     .describe('The number of multiple-choice questions to generate.'),
 });
 export type MCQGeneratorInput = z.infer<typeof MCQGeneratorInputSchema>;

@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { aiChatbot } from '@/ai/flows/ai-chatbot';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+// import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send, Bot, User, Paperclip, Trash2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -20,10 +20,10 @@ interface Message {
 }
 
 export function ChatbotClient() {
-  const [context, setContext] = useState('');
+  // const [context, setContext] = useState('');
   const [query, setQuery] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [activeTab, setActiveTab] = useState('text');
+  // const [activeTab, setActiveTab] = useState('text');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -45,6 +45,8 @@ export function ChatbotClient() {
     // We only want to save if there's something to save, and it's not the initial empty array
     if (messages.length > 0) {
       localStorage.setItem('chatHistory', JSON.stringify(messages));
+    } else if (messages.length === 0) {
+        localStorage.removeItem('chatHistory');
     }
   }, [messages]);
 
@@ -71,9 +73,10 @@ export function ChatbotClient() {
    const handleClearHistory = () => {
     setMessages([]);
     localStorage.removeItem('chatHistory');
+    setFile(null);
     toast({
-      title: 'Chat History Cleared',
-      description: 'Your conversation has been removed.',
+      title: 'Chat Cleared',
+      description: 'Your conversation and uploaded file have been removed.',
     });
   };
 
@@ -88,14 +91,14 @@ export function ChatbotClient() {
       return;
     }
 
-    if (activeTab === 'document' && !file) {
-      toast({
-        title: 'Missing document',
-        description: 'Please upload a PDF document to ask questions about.',
-        variant: 'destructive',
-      });
-      return;
-    }
+    // if (!file) {
+    //   toast({
+    //     title: 'Missing document',
+    //     description: 'Please upload a PDF document to ask questions about.',
+    //     variant: 'destructive',
+    //   });
+    //   return;
+    // }
 
     setIsLoading(true);
     const userMessage: Message = { role: 'user', content: query };
@@ -103,11 +106,12 @@ export function ChatbotClient() {
     
     try {
       let result;
-      if (activeTab === 'document' && file) {
+       if (file) {
         const documentDataUri = await fileToDataUri(file);
         result = await answerQuestions({ documentDataUri, query });
       } else {
-        result = await aiChatbot({ context, query });
+        const historyContext = messages.slice(0, -1).map(m => `${m.role}: ${m.content}`).join('\n');
+        result = await aiChatbot({ query, context: historyContext });
       }
       const botMessage: Message = { role: 'bot', content: result.answer };
       setMessages(prev => [...prev, botMessage]);
@@ -126,43 +130,26 @@ export function ChatbotClient() {
     }
   };
   
-  const isSubmitDisabled = isLoading || !query.trim() || (activeTab === 'document' && !file);
+  const isSubmitDisabled = isLoading || !query.trim();
 
   return (
     <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
       <Card className="lg:col-span-1">
         <CardHeader>
-          <CardTitle>Context</CardTitle>
-          <CardDescription>Provide context from text or a document.</CardDescription>
+         <CardTitle>Context</CardTitle>
+          <CardDescription>Optionally upload a PDF for context.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="text">From Text</TabsTrigger>
-              <TabsTrigger value="document">From Document</TabsTrigger>
-            </TabsList>
-            <TabsContent value="text" className="mt-4">
-              <Textarea
-                value={context}
-                onChange={(e) => setContext(e.target.value)}
-                placeholder="Paste your text here (optional)..."
-                className="h-80"
-                aria-label="Context Input"
-              />
-            </TabsContent>
-            <TabsContent value="document" className="mt-4">
-              <div className="h-80 border-dashed border-2 rounded-lg flex flex-col items-center justify-center p-4 text-center">
-                <Input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} className="hidden"/>
-                <Label htmlFor="pdf-upload" className={cn("cursor-pointer flex flex-col items-center justify-center gap-2", file && "text-green-600")}>
-                    <Paperclip className="h-8 w-8 text-muted-foreground" />
-                    {file ? 
-                        <span>{file.name}</span> : 
-                        <span className="text-muted-foreground">Click to upload PDF</span>
-                    }
-                </Label>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="h-80 border-dashed border-2 rounded-lg flex flex-col items-center justify-center p-4 text-center">
+              <Input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} className="hidden"/>
+              <Label htmlFor="pdf-upload" className={cn("cursor-pointer flex flex-col items-center justify-center gap-2", file && "text-green-600")}>
+                  <Paperclip className="h-8 w-8 text-muted-foreground" />
+                  {file ? 
+                      <span>{file.name}</span> : 
+                      <span className="text-muted-foreground">Click to upload PDF</span>
+                  }
+              </Label>
+            </div>
         </CardContent>
       </Card>
 
@@ -170,12 +157,12 @@ export function ChatbotClient() {
          <CardHeader className="flex flex-row items-center justify-between">
             <div>
                 <CardTitle>Chat</CardTitle>
-                <CardDescription>Ask a question based on the context provided.</CardDescription>
+                <CardDescription>{file ? 'Ask about the document or anything else.' : 'Ask me anything.'}</CardDescription>
             </div>
              {messages.length > 0 && (
                 <Button variant="ghost" size="sm" onClick={handleClearHistory} aria-label="Clear chat history">
                     <Trash2 className="h-4 w-4" />
-                    Clear History
+                    Clear 
                 </Button>
             )}
         </CardHeader>

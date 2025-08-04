@@ -33,7 +33,7 @@ const searchTool = ai.defineTool(
     if (input.query.toLowerCase().includes('news')) {
       return 'The top news is that AI is transforming the world.';
     }
-    return 'No information found.';
+    return 'No information found for your query.';
   }
 );
 

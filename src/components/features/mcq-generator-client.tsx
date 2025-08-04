@@ -57,7 +57,7 @@ export function MCQGeneratorClient() {
 
     try {
       const pdfDataUri = await fileToDataUri(file);
-      const result = await generateMCQs({ pdfDataUri, numberOfQuestions: 5 });
+      const result = await generateMCQs({ pdfDataUri, numberOfQuestions: 30 });
       setMcqs(result.questions);
     } catch (error) {
       console.error(error);

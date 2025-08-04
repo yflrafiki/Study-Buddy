@@ -7,7 +7,6 @@ import {
   FileQuestion,
   LayoutDashboard,
   GraduationCap,
-  Mic,
   ImagePlay,
   BookOpen,
 } from 'lucide-react';
@@ -29,7 +28,6 @@ const menuItems = [
   { href: '/mcq-generator', label: 'MCQ Generator', icon: FileQuestion },
   { href: '/chatbot', label: 'AI Chatbot', icon: Bot },
   { href: '/flashcards', label: 'Flashcards', icon: BookOpen },
-  { href: '/transcription', label: 'Note Taker', icon: Mic },
   { href: '/image-animator', label: 'Image Animator', icon: ImagePlay },
 ];
 
