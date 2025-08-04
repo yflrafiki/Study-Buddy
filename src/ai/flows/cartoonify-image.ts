@@ -39,7 +39,7 @@ const cartoonifyImageFlow = ai.defineFlow(
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
       prompt: [
         { media: { url: input.imageDataUri } },
-        { text: 'Convert this image into a photorealistic cartoon. The style should be detailed and closer to reality, suitable for educational visual aids.' },
+        { text: 'Generate a realistic cartoon version of the uploaded image. Make sure every detail in the uploaded image is taken.The style should be detailed and closer to reality, suitable for educational visual aids.' },
       ],
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
