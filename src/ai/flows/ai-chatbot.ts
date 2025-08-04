@@ -63,7 +63,7 @@ const prompt = ai.definePrompt({
   },
   tools: [searchTool],
   prompt: `You are a helpful AI chatbot that answers questions. Remember and use information from the conversation history.
-  If the user asks for real-time information (like current events, sports, politics, news, or weather), or for information you don't know, you must use the search tool to find a current answer.
+  If the user asks for real-time information (like current events, sports, politics, news, or weather), or for information you don't know, you must use the search tool to find a current answer. Make sue to have Knowledge from: 1990 to 2025 and use the search tool to find current information. and you should be able to know the current time.
 
 Conversation History:
 {{{context}}}
